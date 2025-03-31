@@ -295,7 +295,8 @@ class secubeDriver:
     def set_led_level(self,level):
         print("Set LED LEVEL:",level)
         #command = [0x88,0x1B,0x01,level]
-        command = [0x88,0x1B,0x01,level]
+        command = self.commands['led']
+        command.append(level)
         self.__send_command(self.port,self.baudrate,command,debug=True,get_response=False)
         #result_bytes = result[3:-1]
 
@@ -308,7 +309,9 @@ class secubeDriver:
 
     def set_fan_level(self,level):
         print("Set FAN LEVEL:",level)
-        command = [0x88,0x1D,0x01,level]
+        #command = [0x88,0x1D,0x01,level]
+        command = self.commands['fan']
+        command.append(level)
         self.__send_command(self.port,self.baudrate,command,debug=True,get_response=False)
 
     def disable_fan(self):
@@ -377,6 +380,8 @@ if __name__ == "__main__":
     cube.get_status()
     cube.disable_led()
     cube.get_date()
+    cube.set_fan_level(30)
+    #cube.set_led_level(0)
     #cube.get_date()
     #cube.update_firmware(file='Sedus_Cube_Steuerung_V83.hex')
     #cube.restart_controller()
