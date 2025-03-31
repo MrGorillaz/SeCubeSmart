@@ -395,23 +395,23 @@ def restart_controller():
 #firmware_raw = read_firmware_file(data_only=True)
 #get_version()
 #firmware_data = get_bytes_to_flash()
-firmware_data = get_bytes_to_flash2(fw_file='Sedus_Cube_Steuerung_V80.hex')
-
-get_version()
-erase_flash()
-time.sleep(1.0)
-write_firmware_to_flash(firmware_bytes=firmware_data)
-print('\nVerifying Firmware...')
-firmware_flash = read_flash(blocks_to_read=len(firmware_data))
-successful_flash = verify_flash(firmware_data,firmware_flash)
-
-if (successful_flash):
-    write_new_app_flag()
-    time.sleep(1)
-    restart_controller()
-
-time.sleep(10.0)
-get_version()
+#firmware_data = get_bytes_to_flash2(fw_file='Sedus_Cube_Steuerung_V80.hex')
+#
+#get_version()
+#erase_flash()
+#time.sleep(1.0)
+#write_firmware_to_flash(firmware_bytes=firmware_data)
+#print('\nVerifying Firmware...')
+#firmware_flash = read_flash(blocks_to_read=len(firmware_data))
+#successful_flash = verify_flash(firmware_data,firmware_flash)
+#
+#if (successful_flash):
+#    write_new_app_flag()
+#    time.sleep(1)
+#    restart_controller()
+#
+#time.sleep(10.0)
+#get_version()
 #write_firmware_to_flash(firmware_bytes=firmware_data)
 
 #get_version()
@@ -435,12 +435,12 @@ get_version()
 #for i in range (10):
 #    time.sleep(1.0)
 #    get_status()
-#for i in range(10):
-#    #get_status()
-#    for level in range(1,55,2):
-#        set_led_level(level)
-#        time.sleep(0.05)
-#
+for i in range(10):
+    #get_status()
+    for level in range(1,55,2):
+        set_led_level(level)
+        time.sleep(0.05)
+
 #    for level in  reversed(range(1,55,2)):
 #        set_led_level(level)
 #        time.sleep(0.05)
