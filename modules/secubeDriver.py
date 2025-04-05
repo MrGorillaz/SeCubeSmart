@@ -7,10 +7,10 @@ import os.path
 class secubeDriver:
 
     #Konstruktor
-    def __init__(self,cube_version=1,debug=False,response=False):
+    def __init__(self,port='/dev/ttyS0',baudrate=115200,cube_version=1,debug=False,response=True):
 
-        self.port = 'COM5'
-        self.baudrate = 115200
+        self.port = port
+        self.baudrate = baudrate
         self.cube_version = "secube_v"+str(cube_version)
         self.commands = None
         self.debug = debug
@@ -276,7 +276,7 @@ class secubeDriver:
         print("STATUS Info")
         #command = [0x88,0x0A,0x00]
         command = self.commands['status']
-        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=True))
         result_bytes = result[3:-1]
         pass
 
@@ -381,17 +381,22 @@ class secubeDriver:
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver(debug=True,response=True)
+    cube = secubeDriver(debug=False,port='/dev/ttyS0',baudrate=115200)
     #cube.restart_controller()
     #cube.set_led_level(level=10)
-    cube.get_version()
-    #cube.get_status()
+    #cube.get_version()
+    #for i in range (10):
+    #    cube.get_status()
+    #    time.sleep(1.5)
     #cube.disable_led()
     #cube.get_date()
+    #cube.set_fan_level(100)
+    #time.sleep(10.0)
     #cube.set_fan_level(30)
-    #cube.set_led_level(0)
+
+    cube.set_led_level(80)
     #cube.get_date()
-    #cube.update_firmware(file='Sedus_Cube_Steuerung_V83.hex')
+    #cube.update_firmware(file='/home/secube/SeCubeSmart/Sedus_Cube_Steuerung_V83.hex')
     #cube.restart_controller()
 
 
