@@ -2,16 +2,19 @@ import serial
 import time
 from tqdm import tqdm
 import yaml
+import os.path
 
 class secubeDriver:
 
     #Konstruktor
-    def __init__(self,cube_version=1):
+    def __init__(self,cube_version=1,debug=False,response=False):
 
         self.port = 'COM5'
         self.baudrate = 115200
         self.cube_version = "secube_v"+str(cube_version)
         self.commands = None
+        self.debug = debug
+        self.response = response
         self.__read_config(self.cube_version)
 
 
@@ -19,7 +22,9 @@ class secubeDriver:
 
     #Private Methoden
     def __read_config(self,version):
-        with open("secube_commands.yaml", "r") as file:
+        base_path = os.path.dirname(os.path.abspath(__file__))  # Ordner der aktuellen Datei
+        yaml_path = os.path.join(base_path, "secube_commands.yaml")
+        with open(yaml_path, "r") as file:
             config_data = yaml.safe_load(file)
         self.commands = {list(item.keys())[0]: list(item.values())[0] for item in config_data.get(version, {}).get("command", [])}
         
@@ -50,6 +55,7 @@ class secubeDriver:
 
     #Senden der Seriellen Befehle
     def __send_command(self,com_port,com_baud,command,debug=False,get_response=True,response_wait_sec=1.0):
+
         
         # Erstellen einer Serial-Instanz
         with serial.Serial(com_port, com_baud, timeout=1) as ser:
@@ -255,7 +261,7 @@ class secubeDriver:
         print("Version Info")
         #command = [0x88,0x01,0x00]
         command = self.commands['info']
-        result = list(self.__send_command(self.port,self.baudrate,command))
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         result_bytes = result[3:-1]
         print("Mode: {}".format(result_bytes[0]))
         print("Software_Version: {}".format(result_bytes[1:2]))
@@ -270,7 +276,7 @@ class secubeDriver:
         print("STATUS Info")
         #command = [0x88,0x0A,0x00]
         command = self.commands['status']
-        result = list(self.__send_command(self.port,self.baudrate,command))
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         result_bytes = result[3:-1]
         pass
 
@@ -297,7 +303,7 @@ class secubeDriver:
         #command = [0x88,0x1B,0x01,level]
         command = self.commands['led']
         command.append(level)
-        self.__send_command(self.port,self.baudrate,command,debug=True,get_response=False)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
         #result_bytes = result[3:-1]
 
     def disable_led(self):
@@ -305,26 +311,26 @@ class secubeDriver:
         #self.set_led_level(0)
         #command = [0x88,0x1C,0x00]
         command = self.commands['disable_led']
-        self.__send_command(self.port,self.baudrate,command,debug=True,get_response=True)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
     def set_fan_level(self,level):
         print("Set FAN LEVEL:",level)
         #command = [0x88,0x1D,0x01,level]
         command = self.commands['fan']
         command.append(level)
-        self.__send_command(self.port,self.baudrate,command,debug=True,get_response=False)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
     def disable_fan(self):
         print("Disable_Fan")
         #command = [0x88,0x1E,0x00]
         command = self.commands['disable_fan']
-        self.__send_command(self.port,self.baudrate,command,debug=True,get_response=False)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
     def get_date(self):
         print("Date INFO")
         #command = [0x88,0x24,0x00]
         command = self.commands['date']
-        result = list(self.__send_command(self.port,self.baudrate,command,get_response=True))
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         result_bytes = result[3:-1]
 
         weekdays = {
@@ -370,17 +376,19 @@ class secubeDriver:
 
 
 
-
+##### Testing #################
 
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver()
+    cube = secubeDriver(debug=True,response=True)
+    #cube.restart_controller()
+    #cube.set_led_level(level=10)
     cube.get_version()
-    cube.get_status()
-    cube.disable_led()
-    cube.get_date()
-    cube.set_fan_level(30)
+    #cube.get_status()
+    #cube.disable_led()
+    #cube.get_date()
+    #cube.set_fan_level(30)
     #cube.set_led_level(0)
     #cube.get_date()
     #cube.update_firmware(file='Sedus_Cube_Steuerung_V83.hex')
