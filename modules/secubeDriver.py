@@ -381,16 +381,16 @@ class secubeDriver:
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver(debug=False,port='/dev/ttyS0',baudrate=115200)
+    cube = secubeDriver(debug=True,port='/dev/ttyAMA5',baudrate=115200)
     #cube.restart_controller()
     #cube.set_led_level(level=10)
-    #cube.get_version()
+    cube.get_version()
     #for i in range (10):
     #    cube.get_status()
     #    time.sleep(1.5)
     #cube.disable_led()
     #cube.get_date()
-    #cube.set_fan_level(100)
+    cube.set_fan_level(100)
     #time.sleep(10.0)
     #cube.set_fan_level(30)
 
