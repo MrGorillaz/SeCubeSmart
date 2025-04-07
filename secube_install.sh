@@ -5,3 +5,4 @@ sudo apt-get install git -y
 #Repo muss öffentlich sein
 git clone https://github.com/MrGorillaz/SeCubeSmart.git
 cd SeCubeSmart
+#ToDo
