@@ -7,7 +7,7 @@ import os.path
 class secubeDriver:
 
     #Konstruktor
-    def __init__(self,port='/dev/ttyS0',baudrate=115200,cube_version=1,debug=False,response=True):
+    def __init__(self,port='/dev/ttyS0',baudrate=115200,cube_version=1,debug=False,response=True,response_time=1.0):
 
         self.port = port
         self.baudrate = baudrate
@@ -15,6 +15,7 @@ class secubeDriver:
         self.commands = None
         self.debug = debug
         self.response = response
+        self.response_time = response_time
         self.__read_config(self.cube_version)
 
 
@@ -58,7 +59,7 @@ class secubeDriver:
 
         
         # Erstellen einer Serial-Instanz
-        with serial.Serial(com_port, com_baud, timeout=1) as ser:
+        with serial.Serial(com_port, com_baud, timeout=self.response_time) as ser:
             # Die Hex-Daten, die gesendet werden sollen
             xor_summe = self.__xor_sum(command)
             command.append(xor_summe)
@@ -250,12 +251,35 @@ class secubeDriver:
             print("OK!")
         else:
             print("Error - Flag not Set!!!")
+    
+    def __get_param_1(self):
+        print("Get Param 1 Values")
+        command = self.commands['read_param_1']
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
+        return result
+
+    def __get_param_2(self):
+        print("Get Param 2 Values")
+        command = self.commands['read_param_2']
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
+        return result
 
         
 
     
 ###################################################################################################################
     #Öffentliche Methoden
+
+    def get_serialNumber(self):
+        
+        resp = self.__get_param_1()
+        SN_part = map(chr,resp[171:177])
+        SerialNumber = ''.join(SN_part)
+        print('SerialNumber: {}'.format(SerialNumber))
+
+    def get_params2(self):
+        resp = self.__get_param_2()
+        pass 
     
     def get_version(self):
         print("Version Info")
@@ -381,20 +405,27 @@ class secubeDriver:
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver(debug=True,port='/dev/ttyAMA5',baudrate=115200)
+    cube = secubeDriver(debug=False,port='/dev/ttyAMA5',baudrate=115200,response_time=1.5)
     #cube.restart_controller()
     #cube.set_led_level(level=10)
     cube.get_version()
-    #for i in range (10):
-    #    cube.get_status()
-    #    time.sleep(1.5)
+    cube.get_serialNumber()
+    cube.get_params2()
+    for i in range (10):
+        cube.get_version()
+        time.sleep(0.5)
+        cube.get_status()
+        time.sleep(0.5)
+        cube.get_date()
+        time.sleep(0.5)
+        #cube.set_led_level(i)
+        #time.sleep(0.5)
     #cube.disable_led()
     #cube.get_date()
-    cube.set_fan_level(100)
+    #cube.set_fan_level(100)
     #time.sleep(10.0)
     #cube.set_fan_level(30)
-
-    cube.set_led_level(80)
+    #cube.set_led_level(80)
     #cube.get_date()
     #cube.update_firmware(file='/home/secube/SeCubeSmart/Sedus_Cube_Steuerung_V83.hex')
     #cube.restart_controller()
