@@ -3,6 +3,7 @@ import time
 from tqdm import tqdm
 import yaml
 import os.path
+import copy
 
 class secubeDriver:
 
@@ -62,6 +63,9 @@ class secubeDriver:
         with serial.Serial(com_port, com_baud, timeout=self.response_time) as ser:
             # Die Hex-Daten, die gesendet werden sollen
             xor_summe = self.__xor_sum(command)
+
+            #bugfixing durch deepcopy, weil sonst originales classenobjekt immer verändert wurde
+            command = copy.deepcopy(command)
             command.append(xor_summe)
             #data_to_send = bytes([0x88, 0x10,0x00, 0x90])
             data_to_send = bytes(command)
@@ -263,6 +267,14 @@ class secubeDriver:
         command = self.commands['read_param_2']
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         return result
+    
+    def __write_param_1(self,params):
+        print('Writing Param 1')
+        command = self.commands['write_param_1']
+        command = copy.deepcopy(command)
+        command.extend(params)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
+        pass
 
         
 
@@ -276,6 +288,17 @@ class secubeDriver:
         SN_part = map(chr,resp[171:177])
         SerialNumber = ''.join(SN_part)
         print('SerialNumber: {}'.format(SerialNumber))
+
+    
+    def set_serialNumber(self,new_serial='FH-SWF'):
+        resp = self.__get_param_1()
+
+        resp[171:177] = list(new_serial.encode('utf-8'))
+
+        new_params = resp[3:-1]
+        self.__write_param_1(params=new_params)
+        pass
+
 
     def get_params2(self):
         resp = self.__get_param_2()
@@ -405,21 +428,17 @@ class secubeDriver:
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver(debug=False,port='/dev/ttyAMA5',baudrate=115200,response_time=1.5)
+    cube = secubeDriver(debug=True,port='/dev/ttyAMA5',baudrate=115200,response_time=1.0)
     #cube.restart_controller()
     #cube.set_led_level(level=10)
+    #cube.set_fan_level(0)
+    cube.get_status()
     cube.get_version()
     cube.get_serialNumber()
-    cube.get_params2()
-    for i in range (10):
-        cube.get_version()
-        time.sleep(0.5)
-        cube.get_status()
-        time.sleep(0.5)
-        cube.get_date()
-        time.sleep(0.5)
-        #cube.set_led_level(i)
-        #time.sleep(0.5)
+    cube.set_serialNumber(new_serial='133711')
+    #cube.get_params2()
+  
+  
     #cube.disable_led()
     #cube.get_date()
     #cube.set_fan_level(100)
@@ -427,7 +446,7 @@ if __name__ == "__main__":
     #cube.set_fan_level(30)
     #cube.set_led_level(80)
     #cube.get_date()
-    #cube.update_firmware(file='/home/secube/SeCubeSmart/Sedus_Cube_Steuerung_V83.hex')
+    #cube.update_firmware(file='/home/secube/SeCubeSmart/Sedus_Cube_Steuerung_V73.hex')
     #cube.restart_controller()
 
 
