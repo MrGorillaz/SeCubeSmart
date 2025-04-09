@@ -273,7 +273,7 @@ class secubeDriver:
         command = self.commands['write_param_1']
         command = copy.deepcopy(command)
         command.extend(params)
-        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
+        self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response,response_wait_sec=1.2)
         pass
 
         
@@ -428,15 +428,16 @@ class secubeDriver:
 if __name__ == "__main__":
     print ("hello")
 
-    cube = secubeDriver(debug=True,port='/dev/ttyAMA5',baudrate=115200,response_time=1.0)
+    cube = secubeDriver(debug=False,port='/dev/ttyAMA5',baudrate=115200,response_time=1.0)
     #cube.restart_controller()
     #cube.set_led_level(level=10)
     #cube.set_fan_level(0)
     cube.get_status()
     cube.get_version()
     cube.get_serialNumber()
-    cube.set_serialNumber(new_serial='133711')
-    #cube.get_params2()
+    cube.set_serialNumber(new_serial='FH-SWF')
+    cube.get_serialNumber()
+    cube.get_params2()
   
   
     #cube.disable_led()
