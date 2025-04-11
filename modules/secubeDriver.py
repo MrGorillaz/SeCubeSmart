@@ -299,6 +299,10 @@ class secubeDriver:
         self.__write_param_1(params=new_params)
         pass
 
+    def get_param1(self):
+        resp = self.__get_param_1()
+        pass
+
 
     def get_params2(self):
         resp = self.__get_param_2()
@@ -345,8 +349,8 @@ class secubeDriver:
     #Byte17: fan_selection
     #Byte18: is_co2_warning_enabled
 
-    def set_led_level(self,level):
-        print("Set LED LEVEL:",level)
+    def set_led_level_test(self,level):
+        print("Set LED LEVEL TEST:",level)
         #command = [0x88,0x1B,0x01,level]
         command = self.commands['led']
         command.append(level)
@@ -360,8 +364,8 @@ class secubeDriver:
         command = self.commands['disable_led']
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
-    def set_fan_level(self,level):
-        print("Set FAN LEVEL:",level)
+    def set_fan_level_test(self,level):
+        print("Set FAN LEVEL TEST:",level)
         #command = [0x88,0x1D,0x01,level]
         command = self.commands['fan']
         command.append(level)
@@ -373,11 +377,36 @@ class secubeDriver:
         command = self.commands['disable_fan']
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
     
-    def set_light_level(self,level=10,colour=10):
-        print("SET LIGHT LEVEL:",level)
+    def set_light_level_test(self,level=10,colour=10):
+        print("SET LIGHT LEVEL TEST:",level)
         command = self.commands['light']
         command.extend([level,colour,colour])
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response,response_wait_sec=1.2)
+    
+
+
+    def set_light_start(self,level):
+        print("SET LIGHT LEVEL:",level)
+        resp = self.__get_param_1()
+        resp[51] = level
+        new_params = resp[3:-1]
+        self.__write_param_1(params=new_params)
+        pass
+
+    
+    def get_display_params(self,group=1):
+        print("GET DISPLAY INFO-Group:",group)
+        command = self.commands['read_display_param']
+        command.append(group)
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
+        pass
+
+    def get_display_data(self):
+        print("GET DISPLAY INFO")
+        command = self.commands['read_display_data']
+        result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
+        pass
+        
         
 
     def get_date(self):
@@ -437,15 +466,15 @@ if __name__ == "__main__":
 
     cube = secubeDriver(debug=False,port='/dev/ttyAMA5',baudrate=115200,response_time=1.0)
     #cube.restart_controller()
-    cube.set_led_level(level=30)
-    cube.set_fan_level(30)
+    cube.set_led_level_test(level=30)
+    cube.set_fan_level_test(30)
     #cube.get_status()
     #cube.get_version()
     #cube.get_serialNumber()
     #cube.set_serialNumber(new_serial='FH-SWF')
     #cube.get_serialNumber()
     #cube.get_params2()
-    cube.set_light_level(50,100)
+    cube.set_light_level_test(50,100)
   
   
     #cube.disable_led()
