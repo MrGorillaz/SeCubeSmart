@@ -9,4 +9,4 @@ cube = driver.secubeDriver(debug=True,port='COM12')
 #cube.restart_controller()
 #time.sleep(5.0)
 
-cube.get_display_data()
+#cube.get_display_data()
