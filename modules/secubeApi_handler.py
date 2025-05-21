@@ -2,14 +2,23 @@
 #Flask oder FastAPI?
 import requests
 import hashlib
+import urllib3
+
+# Warnung unterdrücken
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class secubeAPIhandler:
 
-    def __init__(self):
-        self.api_server = '192.168.178.55'
-        self.api_server_port = '8443'
-        self.api_token = "QrOSC1Wq82NrDh8-o3FC0WhSkpz_Qq9Na0uBqSrbcrtL7Ut1Uj-RQVTXI6u1Kmsv5Kt6w-n8At8J1JmcfuCUzw"
+    def __init__(self,
+                 api_server='192.168.178.55',
+                 api_server_port=8443,
+                 api_token="QrOSC1Wq82NrDh8-o3FC0WhSkpz_Qq9Na0uBqSrbcrtL7Ut1Uj-RQVTXI6u1Kmsv5Kt6w-n8At8J1JmcfuCUzw"):
+        
+
+        self.api_server = api_server
+        self.api_server_port = api_server_port
+        self.api_token = api_token
     
 
     def _sha256sum(self,filepath):
@@ -73,4 +82,4 @@ if __name__ == "__main__":
     #                                 api_port=secube_api.api_server_port,
     #                                 api_token=secube_api.api_token)
     
-    secube_api.get_next_command(api_server=secube_api.api_server,api_port=secube_api.api_server_port,api_token=secube_api.api_token)
+    commands = secube_api.get_next_command(api_server=secube_api.api_server,api_port=secube_api.api_server_port,api_token=secube_api.api_token)
