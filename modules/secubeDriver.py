@@ -282,12 +282,16 @@ class secubeDriver:
 ###################################################################################################################
     #Öffentliche Methoden
 
-    def get_serialNumber(self):
+    def get_serialNumber(self,debug=True):
         
         resp = self.__get_param_1()
         SN_part = map(chr,resp[171:177])
         SerialNumber = ''.join(SN_part)
-        print('SerialNumber: {}'.format(SerialNumber))
+        
+        if debug:
+            print('SerialNumber: {}'.format(SerialNumber))
+        
+        return SerialNumber
 
     
     def set_serialNumber(self,new_serial='FH-SWF'):
@@ -308,36 +312,55 @@ class secubeDriver:
         resp = self.__get_param_2()
         pass 
     
-    def get_version(self):
-        print("Version Info")
+    def get_version(self,debug=True):
         #command = [0x88,0x01,0x00]
         command = self.commands['info']
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         result_bytes = result[3:-1]
-        print("Mode: {}".format(result_bytes[0]))
-        print("Software_Version: {}".format(result_bytes[1:2]))
-        print("Light Type: {}".format(result_bytes[3]))
-        print("\n")
+
+        if (debug):
+            print("Version Info")
+            print("Mode: {}".format(result_bytes[0]))
+            print("Software_Version: {}".format(result_bytes[1:2]))
+            print("Light Type: {}".format(result_bytes[3]))
+            print("\n")
+
+        info = {
+            "mode": result_bytes[0],
+            "fw" : result_bytes[1:2],
+            "light" : result_bytes[3]
+        }
+        return info
 
     #Byte 0: Mode: 0 = Bootloader; 1 = User
     #Byte 1-2: software version
     #Byte 3: light type: 0 = standard light; 1 = coloured light
 
-    def get_status(self):
-        print("STATUS Info")
+    def get_status(self,debug=True):
+        
         #command = [0x88,0x0A,0x00]
         command = self.commands['status']
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=True))
         result_bytes = result[3:-1]
         pass
-
-        print("PIR_Sensor: {}".format(result_bytes[0]))
-        print("Cube_Busy: {}".format(result_bytes[1]))
-        print("C02_Concentration: {} ppm".format(self.__calc_results(result_bytes[2:6])/100))
-        #print("Temperature: {}.{} °C".format(int("".join(f"{x:02x}" for x in result_bytes[6:10]), 16),result_bytes[10]))
-        print("Temperature : {} °C".format(self.__calc_results(result_bytes[6:10])/100))
-        print("humidity: {} %RH".format(self.__calc_results(result_bytes[10:14])/100))
-        print("\n")
+        if debug:
+            print("STATUS Info")
+            print("PIR_Sensor: {}".format(result_bytes[0]))
+            print("Cube_Busy: {}".format(result_bytes[1]))
+            print("C02_Concentration: {} ppm".format(self.__calc_results(result_bytes[2:6])/100))
+            #print("Temperature: {}.{} °C".format(int("".join(f"{x:02x}" for x in result_bytes[6:10]), 16),result_bytes[10]))
+            print("Temperature : {} °C".format(self.__calc_results(result_bytes[6:10])/100))
+            print("humidity: {} %RH".format(self.__calc_results(result_bytes[10:14])/100))
+            print("\n")
+        
+        status = { 
+            "pir": result_bytes[0],
+            "busy" : result_bytes[1],
+            "co2" : self.__calc_results(result_bytes[2:6])/100,
+            "temp" : self.__calc_results(result_bytes[6:10])/100,
+            "hum" :  self.__calc_results(result_bytes[10:14])/100
+        }
+        return status
     #Byte0: pir_sensor
     #Byte1: is_cube_busy
     #Byte2-5: co2_concentration
