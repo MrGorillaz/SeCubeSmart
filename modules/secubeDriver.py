@@ -327,7 +327,7 @@ class secubeDriver:
 
         info = {
             "mode": result_bytes[0],
-            "fw" : result_bytes[1:2],
+            "fw" : str(result_bytes[1:2]),
             "light" : result_bytes[3]
         }
         return info
