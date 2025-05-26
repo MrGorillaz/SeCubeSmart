@@ -41,7 +41,7 @@ def do_cmd(cmd):
         zip_pfad = 'file.zip'
 
         # Zielverzeichnis
-        ziel_verzeichnis = 'secube_fw'
+        ziel_verzeichnis = '/tmp/secube_fw'
 
         # ZIP-Datei öffnen und extrahieren
         with zipfile.ZipFile(zip_pfad, 'r') as zip_ref:
@@ -49,7 +49,7 @@ def do_cmd(cmd):
 
         print(f'Dateien wurden in "{ziel_verzeichnis}" extrahiert.')
 
-        cube.update_firmware(file='/home/secube/secube_fw/{}.hex'.format(cmd["value"]))
+        cube.update_firmware(file='{}/{}.hex'.format(ziel_verzeichnis,cmd["value"]))
         time.sleep(10.0)
     
     return False
