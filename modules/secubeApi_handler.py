@@ -39,7 +39,7 @@ class secubeAPIhandler:
                     "version": version
                 }
 
-        response = requests.get(url, headers=headers, json=data, verify=False)
+        response = requests.post(url, headers=headers, json=data, verify=False)
         
         download_data = response.json()
 
@@ -82,4 +82,5 @@ if __name__ == "__main__":
     #                                 api_port=secube_api.api_server_port,
     #                                 api_token=secube_api.api_token)
     
-    commands = secube_api.get_next_command(api_server=secube_api.api_server,api_port=secube_api.api_server_port,api_token=secube_api.api_token)
+    #commands = secube_api.get_next_command(api_server=secube_api.api_server,api_port=secube_api.api_server_port,api_token=secube_api.api_token)
+    download = secube_api.download_secube_files(api_server=secube_api.api_server,api_port=secube_api.api_server_port,api_token=secube_api.api_token)
