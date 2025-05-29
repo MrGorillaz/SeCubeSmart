@@ -1,15 +1,18 @@
 from  paho.mqtt import client as mqtt
+import ssl
 import random
 
 class secubeMQTT:
 
-    def __init__(self,mqtt_server='192.168.178.55',mqtt_port=1883,mqtt_user="sedus",mqtt_pw="sedus123",mqtt_timeout=60):
+    def __init__(self,mqtt_server='192.168.178.55',mqtt_port=1883,mqtt_user="sedus",mqtt_pw="sedus123",mqtt_timeout=60,mqtt_tls=False):
         self.mqtt_server = mqtt_server
         self.mqtt_port = mqtt_port
         self.mqtt_timeout = mqtt_timeout
         self.mqtt_user = mqtt_user
         self.mqtt_pw = mqtt_pw
+        self.mqtt_tls = mqtt_tls
         self.mqtt_client = self.__create_client()
+        
 
     def __create_client(self):
         def on_connect(client, userdata, flags, rc):
@@ -29,6 +32,15 @@ class secubeMQTT:
         # client.username_pw_set(username, password)
         client.on_connect = on_connect
         client.username_pw_set(self.mqtt_user,self.mqtt_pw)
+
+        if (self.mqtt_tls):
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE  # <-- Zertifikat wird NICHT geprüft
+            #client.tls_set()
+            client.tls_set_context(context)
+            client.tls_insecure_set(True)
+
         client.connect(self.mqtt_server,self.mqtt_port,self.mqtt_timeout)
         return client
     
@@ -46,5 +58,5 @@ class secubeMQTT:
 
 if __name__ == "__main__":
 
-    mqtt_obj = secubeMQTT()
+    mqtt_obj = secubeMQTT(mqtt_tls=True,mqtt_port=8883)
     mqtt_obj.send_mqtt_data("data")
