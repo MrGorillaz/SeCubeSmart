@@ -21,4 +21,5 @@ secube_api:
   api_server : '192.168.178.55'
   api_port : 8443
   api_token: 'QrOSC1Wq82NrDh8-o3FC0WhSkpz_Qq9Na0uBqSrbcrtL7Ut1Uj-RQVTXI6u1Kmsv5Kt6w-n8At8J1JmcfuCUzw'
+  api_cmd_expire: 300
 

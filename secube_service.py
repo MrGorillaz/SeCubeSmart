@@ -3,6 +3,7 @@ import modules.secubeApi_handler as api
 import modules.secube_mqtt_handler as mqtt
 import modules.mod_read_config as config
 import time
+from datetime import datetime,timezone
 import zipfile
 import os
 
@@ -121,7 +122,18 @@ while (True):
         if len(commands["next_commands"]) > 0:
             for command in commands['next_commands']:
                 print(command)
-                do_cmd(command)
+                
+                #TO-DO: Time for commands should expire
+                cmd_expire_time = datetime.fromisoformat(command['timestamp']).replace(tzinfo=timezone.utc)
+                cmd_expire_time = cmd_expire_time.timestamp()+cube_config['secube_api']['api_cmd_expire']
+                #cmd_expire_time = time.mktime(cmd_expire_time.timetuple()) + (cmd_expire_time.microsecond / 1_000_000) + 300
+
+                if is_time_up(cmd_expire_time):
+                    print("expired command")
+                else:
+                    do_cmd(command)
+
+                
         
         if is_time_up(wait_time_api):
             wait_time_api = inc_time_up(time_api_sec)

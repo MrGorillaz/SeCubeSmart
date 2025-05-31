@@ -375,7 +375,7 @@ class secubeDriver:
     def set_led_level_test(self,level):
         print("Set LED LEVEL TEST:",level)
         #command = [0x88,0x1B,0x01,level]
-        command = self.commands['led']
+        command = copy.deepcopy(self.commands['led'])
         command.append(level)
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
         #result_bytes = result[3:-1]
@@ -384,25 +384,26 @@ class secubeDriver:
         print("Disable LED")
         #self.set_led_level(0)
         #command = [0x88,0x1C,0x00]
-        command = self.commands['disable_led']
+        
+        command = copy.deepcopy(self.commands['disable_led'])
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
     def set_fan_level_test(self,level):
         print("Set FAN LEVEL TEST:",level)
         #command = [0x88,0x1D,0x01,level]
-        command = self.commands['fan']
+        command = copy.deepcopy(self.commands['fan'])
         command.append(level)
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
 
     def disable_fan(self):
         print("Disable_Fan")
         #command = [0x88,0x1E,0x00]
-        command = self.commands['disable_fan']
+        command = copy.deepcopy(self.commands['disable_fan'])
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response)
     
     def set_light_level_test(self,level=10,colour=10):
         print("SET LIGHT LEVEL TEST:",level)
-        command = self.commands['light']
+        command = copy.deepcopy(self.commands['light'])
         command.extend([level,colour,colour])
         self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response,response_wait_sec=1.2)
     
@@ -419,14 +420,14 @@ class secubeDriver:
     
     def get_display_params(self,group=1):
         print("GET DISPLAY INFO-Group:",group)
-        command = self.commands['read_display_param']
+        command = copy.deepcopy(self.commands['read_display_param'])
         command.append(group)
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         pass
 
     def get_display_data(self):
         print("GET DISPLAY INFO")
-        command = self.commands['read_display_data']
+        command = copy.deepcopy(self.commands['read_display_data'])
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         pass
         
@@ -435,7 +436,7 @@ class secubeDriver:
     def get_date(self):
         print("Date INFO")
         #command = [0x88,0x24,0x00]
-        command = self.commands['date']
+        command = copy.deepcopy(self.commands['date'])
         result = list(self.__send_command(self.port,self.baudrate,command,debug=self.debug,get_response=self.response))
         result_bytes = result[3:-1]
 
@@ -458,7 +459,7 @@ class secubeDriver:
     def restart_controller(self):
         print("Restarting...",end='')
         #command = [0x88,0x06,0x04,0xBB,0xDD,0xAA,0xCC]
-        command = self.commands['restart']
+        command = copy.deepcopy(self.commands['restart'])
         resp = self.__send_command(self.port,self.baudrate,command,debug=False,get_response=True,response_wait_sec=1.0)
         print("OK!")
 
