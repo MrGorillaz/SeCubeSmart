@@ -91,6 +91,8 @@ def inc_time_up(inc_sec):
 next_cycle = time.time()
 
 serial = cube.get_serialNumber()
+cube_api.update_device_infos(cube_api.api_server,cube_api.api_server_port,cube_api.api_token,update_data={"serial":serial})
+
 identity = "secube/{}".format(serial)
 
 time_mqtt_sec = 60
@@ -102,44 +104,48 @@ wait_time_api = inc_time_up(time_api_sec)
     
 while (True):
 
-    version = cube.get_version()
-    ''
-    status = cube.get_status()
+    try:
+        version = cube.get_version()
+        ''
+        status = cube.get_status()
 
-    if (is_time_up(wait_time_mqtt)) or (status['busy'] == 1):
-    
-        cube_mqtt.send_mqtt_data(data = status,top_topic=identity)
-        cube_mqtt.send_mqtt_data(data = version,top_topic=identity)
+        if (is_time_up(wait_time_mqtt)) or (status['busy'] == 1):
         
-        if is_time_up(wait_time_mqtt):
-            wait_time_mqtt = inc_time_up(time_mqtt_sec)
+            cube_mqtt.send_mqtt_data(data = status,top_topic=identity)
+            cube_mqtt.send_mqtt_data(data = version,top_topic=identity)
+            cube_api.update_device_infos(cube_api.api_server,cube_api.api_server_port,cube_api.api_token,update_data={"status":status})
+            cube_api.update_device_infos(cube_api.api_server,cube_api.api_server_port,cube_api.api_token,update_data={"version":version})
+
+            if is_time_up(wait_time_mqtt):
+                wait_time_mqtt = inc_time_up(time_mqtt_sec)
 
 
 
 
-    if (is_time_up(wait_time_api)) or (status['busy'] == 1):
-        commands = cube_api.get_next_command(cube_api.api_server,cube_api.api_server_port,cube_api.api_token)
-        if len(commands["next_commands"]) > 0:
-            for command in commands['next_commands']:
-                print(command)
-                
-                #TO-DO: Time for commands should expire
-                cmd_expire_time = datetime.fromisoformat(command['timestamp']).replace(tzinfo=timezone.utc)
-                cmd_expire_time = cmd_expire_time.timestamp()+cube_config['secube_api']['api_cmd_expire']
-                #cmd_expire_time = time.mktime(cmd_expire_time.timetuple()) + (cmd_expire_time.microsecond / 1_000_000) + 300
+        if (is_time_up(wait_time_api)) or (status['busy'] == 1):
+            commands = cube_api.get_next_command(cube_api.api_server,cube_api.api_server_port,cube_api.api_token)
+            if len(commands["next_commands"]) > 0:
+                for command in commands['next_commands']:
+                    print(command)
 
-                if is_time_up(cmd_expire_time):
-                    print("expired command")
-                else:
-                    do_cmd(command)
+                    #TO-DO: Time for commands should expire
+                    cmd_expire_time = datetime.fromisoformat(command['timestamp']).replace(tzinfo=timezone.utc)
+                    cmd_expire_time = cmd_expire_time.timestamp()+cube_config['secube_api']['api_cmd_expire']
+                    #cmd_expire_time = time.mktime(cmd_expire_time.timetuple()) + (cmd_expire_time.microsecond / 1_000_000) + 300
 
-                
-        
-        if is_time_up(wait_time_api):
-            wait_time_api = inc_time_up(time_api_sec)
+                    if is_time_up(cmd_expire_time):
+                        print("expired command")
+                    else:
+                        do_cmd(command)
 
-    #print(commands)
 
+
+            if is_time_up(wait_time_api):
+                wait_time_api = inc_time_up(time_api_sec)
+
+        #print(commands)
+    except:
+        print("something went wrong")
  
 
 #cube_api.download_secube_files(cube_api.api_server,cube_api.api_server_port,cube_api.api_token,version='v83')

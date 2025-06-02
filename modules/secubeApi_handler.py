@@ -73,6 +73,45 @@ class secubeAPIhandler:
             return commands.json()
         else:
             return None
+    
+    def update_device_infos(self,api_server,api_port,api_token,update_data):
+
+        url = "https://{}:{}/api/v1/update_secube_data".format(api_server,api_port)
+        headers = {
+                    "Authorization": "Bearer "+api_token,
+                    "Content-Type": "application/json"
+        }
+
+        data = {}
+
+        for key,value in update_data.items():
+            
+            if key == "status":
+                data = {
+                        "metric_pir": value["pir"],
+                        "metric_busy": value["busy"],
+                        "metric_co2_ppm": value["co2"],
+                        "metric_temperature": value["temp"],
+                        "metric_humidity": value["hum"]
+                }
+            
+            elif key == "version":
+                data = {
+                        "firmware": value["fw"],
+                        "light": value["light"],
+                        "mode" : value["mode"]
+                }
+            
+            elif key == "serial":
+                data = {
+                    "serial": value
+                }
+
+
+
+        response = requests.post(url, headers=headers, json=data, verify=False)
+        pass
+
 
 
 
